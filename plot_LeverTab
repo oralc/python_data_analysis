@@ -1,0 +1,59 @@
+import matplotlib.pyplot as plt
+import numpy as np
+
+# Lookup table from the user (hex values converted to int16)
+i16LeverTab = [
+    0x0000, 0x1A7C, 0x2745, 0x3172, 0x3A39,
+    0x4218, 0x494F, 0x5005, 0x5654,
+    0x5C4D, 0x61FF, 0x6773, 0x6CB1,
+    0x71C0, 0x76A4, 0x7B63, 0x7FFF
+]
+
+# Each table index represents steps of 2048 in input (0 to 32768)
+x_points = np.arange(0, 2048*len(i16LeverTab), 2048)
+y_points = np.array(i16LeverTab)
+
+# Define full input range 0..32767
+x_full = np.arange(0, 32768)
+
+# Interpolation function (same as InterpolateXY)
+def interpolate(x, x1, x2, y1, y2):
+    if x2 == x1:
+        x2 = x1 + 1
+    return y1 + ((y2 - y1) * (x - x1)) / (x2 - x1)
+
+# Generate interpolated output
+y_full = np.zeros_like(x_full, dtype=float)
+for i in range(len(i16LeverTab)-1):
+    x1, x2 = i*2048, (i+1)*2048
+    y1, y2 = i16LeverTab[i], i16LeverTab[i+1]
+    for x in range(x1, x2):
+        y_full[x] = interpolate(x, x1, x2, y1, y2)
+
+# Normalize for comparison (map 0..32767 to 0..32767)
+y_linear = x_full  # ideal linear 1:1 mapping
+
+# Convert input and output to percentage scale (0-100%)
+x_percent = x_full / 32767 * 100
+y_full_percent = y_full / 32767 * 100
+y_linear_percent = y_linear / 32767 * 100
+x_points_percent = x_points / 32767 * 100
+y_points_percent = y_points / 32767 * 100
+
+# Plot in percentage domain
+plt.figure(figsize=(10,6))
+plt.plot(x_percent, y_full_percent, label="Interpolation output Schieberlinearisierung´(LeverTab)", linewidth=2)
+plt.plot(x_percent, y_linear_percent, label="Linear Calculated Ramp", linestyle="--", linewidth=1.5)
+plt.scatter(x_points_percent, y_points_percent, color="red", zorder=5, label="Table Points in LeverTab")
+
+plt.title("Lookup Table Mapping vs Linear Mapping (Percentage Scale)")
+plt.xlabel("Input [%]")
+plt.ylabel("Output [%]")
+plt.xlim(0, 100)
+plt.ylim(0, 100)
+plt.xticks(np.linspace(0, 100, 11))  # 0, 10, ..., 100
+plt.yticks(np.linspace(0, 100, 11))  # 0, 10, ..., 100
+plt.legend()
+plt.grid(True, which='major', axis='both')
+plt.tight_layout()
+plt.show()

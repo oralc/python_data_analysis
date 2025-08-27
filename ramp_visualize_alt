@@ -1,0 +1,44 @@
+import numpy as np
+import matplotlib.pyplot as plt
+
+# Parameters
+ramp_start = 1500       # Start of ramp
+ramp_end = 2000         # End of ramp
+max_reduction = 32767   # Maximum speed reduction
+min_reduction = 32767/3  # Minimum allowed reduction
+
+# Rope positions along the ramp
+rope_positions = np.linspace(ramp_start - 20, ramp_end + 20, 200)  # Include some outside ramp
+
+# Calculate speed reduction
+speed_reduction = np.zeros_like(rope_positions)
+speed_reduction[:] = 32767
+
+for i, pos in enumerate(rope_positions):
+    if pos < ramp_start:
+        speed_reduction[i] = 32767
+    elif ramp_start < pos < ramp_end:
+        delta = ramp_end - pos
+        ramp_length = ramp_end - ramp_start
+        set_speed = int(delta * max_reduction / ramp_length)
+        # Apply minimum reduction
+        if set_speed < min_reduction:
+            set_speed = min_reduction
+        speed_reduction[i] = set_speed
+    else:
+        speed_reduction[i] = 0  # Outside ramp
+
+# Convert speed reduction to percentage
+speed_reduction_percent = speed_reduction / 32767 * 100
+
+# Plot
+plt.figure(figsize=(10, 5))
+plt.plot(rope_positions, speed_reduction_percent, label='Speed Reduction (%)', color='blue', linewidth=2)
+plt.axvline(ramp_start, color='green', linestyle='--', label='Ramp Start')
+plt.axvline(ramp_end, color='red', linestyle='--', label='Ramp End')
+plt.xlabel('Rope Position')
+plt.ylabel('Speed Reduction (%)')
+plt.title('Low Velocity Area Ramp')
+plt.grid(True)
+plt.legend()
+plt.show()
