@@ -19,9 +19,15 @@ def main():
     # Work duration in minutes (7.7 hours = 462 minutes)
     work_duration = 7 * 60 + 42
 
-    # If continuous work >= 6 hours, subtract 30 min
-    if work_duration > 6 * 60:
-        work_duration -= 30
+    # Current time in minutes since midnight
+    now = time.localtime()
+    now_minutes = now.tm_hour * 60 + now.tm_min
+
+    # If time between clock-in and now is more than 6 hours, deduct 30 minutes
+    worked_time = now_minutes - clock_in_minutes
+    if worked_time > 6 * 60:
+        print("More than 6 hours since clock-in: 30 minutes break deducted.")
+        work_duration += 30
 
     # Clock-out time in minutes
     clock_out_minutes = clock_in_minutes + work_duration
@@ -33,18 +39,17 @@ def main():
     print(f"Clock out time: {out_h:02d}:{out_m:02d}")
 
     # --- Check overtime ---
-    # Current time in minutes since midnight
-    now = time.localtime()
-    now_minutes = now.tm_hour * 60 + now.tm_min08
+    def to_decimal_hour(h, m):
+        return f"{h},{int(m/60*100):02d}"  # e.g., 1h 12m -> 1,20
 
     if now_minutes > clock_out_minutes:
         overtime = now_minutes - clock_out_minutes
         oh, om = divmod(overtime, 60)
-        print(f"⚠️ You are already overworking by {oh}h {om}m.")
+        print(f"⚠️ You are already overworking by {to_decimal_hour(oh, om)} hours.")
     else:
         remaining = clock_out_minutes - now_minutes
         rh, rm = divmod(remaining, 60)
-        print(f"⏳ Remaining work time: {rh}h {rm}m.")
+        print(f"⏳ Remaining work time: {to_decimal_hour(rh, rm)} hours.")
 
 if __name__ == "__main__":
     main()
