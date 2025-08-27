@@ -40,7 +40,6 @@ def main():
     if now_minutes > clock_out_minutes:
         overtime = now_minutes - clock_out_minutes
         oh, om = divmod(overtime, 60)
-        #om = om / 60
         print(f"⚠️ You are already overworking by {oh}h {om}m.")
     else:
         remaining = clock_out_minutes - now_minutes
