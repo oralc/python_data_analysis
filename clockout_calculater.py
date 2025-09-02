@@ -26,8 +26,11 @@ def main():
     # If time between clock-in and now is more than 6 hours, deduct 30 minutes
     worked_time = now_minutes - clock_in_minutes
     if worked_time > 6 * 60:
-      # print("More than 6 hours since clock-in: 30 minutes break deducted.")
+        print("Mahzeit gehabt: 30 minutes break deducted.")
         work_duration += 30
+    else:
+        print("Less than 6h since clock-in: No break deducted.")
+
 
     # Clock-out time in minutes
     clock_out_minutes = clock_in_minutes + work_duration
@@ -45,7 +48,7 @@ def main():
     if now_minutes > clock_out_minutes:
         overtime = now_minutes - clock_out_minutes
         oh, om = divmod(overtime, 60)
-        print(f"⚠️ You are already overworking by {to_decimal_hour(oh, om)} .")
+        print(f"⚠️ Overworking by {to_decimal_hour(oh, om)} .")
     else:
         remaining = clock_out_minutes - now_minutes
         rh, rm = divmod(remaining, 60)
