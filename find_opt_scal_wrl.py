@@ -1,0 +1,1 @@
+# Plot the curves of SET and DYM versus rope length to analyze behavior and identify optimal parameter settings.
